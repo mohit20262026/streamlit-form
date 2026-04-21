@@ -1,27 +1,42 @@
 import streamlit as st
+import pandas as pd
+import os
 
-st.set_page_config(page_title="Mobile Form Demo", layout="centered")
+st.set_page_config(page_title="Form + CSV Storage", layout="centered")
 
-st.title("📱 Mobile Friendly Form")
+st.title("📱 Streamlit Form with Data Storage")
 
-st.write("Fill this form on your phone or desktop")
+# File where data will be stored
+FILE_PATH = "submissions.csv"
 
+# Create file if it doesn't exist
+if not os.path.exists(FILE_PATH):
+    df = pd.DataFrame(columns=["Name", "Age", "Email", "Feedback"])
+    df.to_csv(FILE_PATH, index=False)
+
+# Form UI
 with st.form("user_form"):
-    name = st.text_input("Enter your name")
-    age = st.number_input("Enter your age", min_value=0, max_value=120)
-    email = st.text_input("Enter your email")
+    name = st.text_input("Name")
+    age = st.number_input("Age", 0, 120)
+    email = st.text_input("Email")
+    feedback = st.text_area("Feedback")
 
-    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+    submit = st.form_submit_button("Submit")
 
-    feedback = st.text_area("Your feedback")
+# When submitted
+if submit:
+    new_entry = pd.DataFrame([[name, age, email, feedback]],
+                             columns=["Name", "Age", "Email", "Feedback"])
 
-    submitted = st.form_submit_button("Submit")
+    old_data = pd.read_csv(FILE_PATH)
 
-if submitted:
-    st.success("Form submitted successfully!")
-    st.write("### Submitted Data:")
-    st.write("Name:", name)
-    st.write("Age:", age)
-    st.write("Email:", email)
-    st.write("Gender:", gender)
-    st.write("Feedback:", feedback)
+    updated_data = pd.concat([old_data, new_entry], ignore_index=True)
+
+    updated_data.to_csv(FILE_PATH, index=False)
+
+    st.success("✅ Data saved successfully!")
+
+# Show all data
+st.subheader("📊 All Submitted Data")
+df = pd.read_csv(FILE_PATH)
+st.dataframe(df, use_container_width=True)
