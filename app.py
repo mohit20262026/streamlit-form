@@ -89,7 +89,7 @@ hide_streamlit_style = """
         align-items: center !important;
         position: absolute;
         top: -60px;
-        left: 180px;
+        left: 170px;
         line-height: 1 !important;
     }
    
